@@ -1,30 +1,40 @@
-🛡️ Aegis Pay
-AI-Native Real-Time Fintech Payment Fraud Detection & Auto-Remediation Platform
+# 🛡️ Aegis Pay
 
-Aegis Pay is an AI-native, event-driven fintech fraud detection platform built to detect suspicious payment transactions in real time, perform intelligent risk assessment, automatically remediate high-risk accounts, and maintain an immutable audit trail.
+### AI-Native Real-Time Fintech Payment Fraud Detection & Auto-Remediation Platform
 
-Built with Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka, PostgreSQL, PgVector, Redis, and virtual threads.
+Aegis Pay is an **AI-native, event-driven fintech fraud detection platform** designed to detect suspicious payment transactions in real time, perform intelligent risk assessment, automatically remediate high-risk accounts, and maintain an immutable audit trail.
 
-🚀 Features
-⚡ Real-time payment transaction processing
-🤖 Two-stage AI-powered fraud detection
-🧠 Fast LLM assessment using Ollama
-🔬 Deep AI assessment using OpenAI
-📚 RAG-based historical transaction analysis
-🔎 PgVector similarity search
-🌐 IP reputation analysis
-🚨 Automatic high-risk transaction detection
-🔒 Automatic account freezing
-🚩 Automatic account flagging
-📒 Immutable event-sourced audit trail
-📦 Transactional Outbox Pattern
-📨 Event-driven Kafka architecture
-🧩 Modular architecture with Spring Modulith
-🧵 Java 21 Virtual Threads
-📡 REST / WebSocket transaction ingestion
-🔄 Versioned Kafka events
-🐳 Docker-based infrastructure
-🏗️ Architecture
+Built with **Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka, PostgreSQL, PgVector, Redis, and Virtual Threads**.
+
+---
+
+## 🚀 Features
+
+- ⚡ Real-time payment transaction processing
+- 🤖 AI-powered fraud detection
+- 🧠 Two-stage LLM risk assessment
+- 🔬 Fast fraud assessment using Ollama
+- 🧠 Deep fraud assessment using OpenAI
+- 📚 RAG-based historical transaction analysis
+- 🔎 PgVector similarity search
+- 🌐 IP reputation analysis
+- 🚨 Automatic high-risk transaction detection
+- 🔒 Automatic account freezing
+- 🚩 Automatic account flagging
+- 📒 Immutable audit trail
+- 📦 Transactional Outbox Pattern
+- 📨 Event-driven Kafka architecture
+- 🧩 Modular architecture using Spring Modulith
+- 🧵 Java 21 Virtual Threads
+- 📡 REST / WebSocket transaction ingestion
+- 🔄 Versioned Kafka events
+- 🐳 Docker-based infrastructure
+
+---
+
+## 🏗️ Architecture
+
+```text
                          ┌──────────────────────┐
                          │   Payment Client     │
                          └──────────┬───────────┘
@@ -42,16 +52,16 @@ Built with Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka, P
                                     ▼
                          ┌──────────────────────┐
                          │ Transactional Outbox │
-                         │    outbox_event       │
+                         │     outbox_event     │
                          └──────────┬───────────┘
                                     │
                                     ▼
                          ┌──────────────────────┐
                          │        Kafka         │
                          │                      │
-                         │ aegis.transaction.v1 │
+                         │ aegis.transaction.v1│
                          │ aegis.risk.v1        │
-                         │ aegis.remediation.v1 │
+                         │ aegis.remediation.v1│
                          └──────────┬───────────┘
                                     │
                                     ▼
@@ -101,12 +111,12 @@ Built with Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka, P
 Aegis Pay follows a modular architecture using Spring Modulith.
 
 Module	Responsibility	Owns
-ingestion	REST/WebSocket intake, validation and normalization	Transaction aggregate
+ingestion	Transaction intake, validation and normalization	Transaction aggregate
 riskengine	AI fraud scoring, RAG and historical analysis	risk_assessments
 remediation	Automated account actions	Account aggregate
 ledger	Immutable audit trail	ledger_events
 
-All cross-module communication is asynchronous through versioned Kafka events.
+Modules communicate asynchronously through versioned Kafka events.
 
 aegis.<domain>.vN
 
@@ -160,9 +170,6 @@ Database Transaction
                  ▼
                Kafka
 
-
-This prevents the classic failure scenario where the database transaction succeeds but Kafka publishing fails.
-
 3. AI Risk Assessment
 
 The riskengine consumes the transaction event.
@@ -194,8 +201,6 @@ AI-generated reasoning
 
 Aegis Pay uses PostgreSQL + PgVector to retrieve historical transaction context.
 
-The risk engine retrieves the customer's nearest historical transactions and provides them as context for the deep AI assessment.
-
 Incoming Transaction
         │
         ▼
@@ -214,7 +219,7 @@ OpenAI Deep Assessment
 Risk Score
 
 
-This allows the AI to evaluate a transaction in the context of previous behavior instead of treating every transaction independently.
+This allows the AI to evaluate a transaction in the context of previous customer behavior.
 
 🚨 Risk & Remediation
 
@@ -229,7 +234,9 @@ Risk Score	Action
 < 75	Allow / Monitor
 >= 75	Flag Account
 >= 90	Freeze Account
-Example
+
+Example:
+
 Risk Score = 94
        │
        ▼
@@ -248,7 +255,7 @@ Immutable Ledger
 
 The ledger module maintains an append-only audit trail.
 
-Important events are recorded for traceability, including:
+Important events include:
 
 Transaction events
 Risk assessments
@@ -284,7 +291,7 @@ Publish Kafka Event
 Kafka Failure ❌
 
 
-the system performs:
+The system performs:
 
 ┌────────────────────────────┐
 │       DB Transaction       │
@@ -303,7 +310,7 @@ the system performs:
             Kafka
 
 
-The architecture is also designed to be Debezium-ready for future CDC-based event publishing.
+This prevents inconsistencies between database state and published events.
 
 🛠️ Technology Stack
 Technology	Purpose
@@ -311,15 +318,15 @@ Java 21	Application runtime
 Spring Boot 3.5	Backend framework
 Spring Modulith 1.4	Modular architecture
 Spring AI 1.0	AI integration
-Ollama	Fast local LLM assessment
-OpenAI	Deep fraud assessment
+Ollama	Local LLM assessment
+OpenAI	Deep AI assessment
 Apache Kafka	Event streaming
 PostgreSQL 17	Primary database
 PgVector	Vector similarity search
 Redis 7	Caching
 Virtual Threads	High-concurrency processing
 Maven	Build system
-Docker Compose	Local infrastructure
+Docker Compose	Infrastructure
 📁 Project Structure
 aegis-pay/
 │
@@ -347,12 +354,12 @@ aegis-pay/
 │   └── compose/
 │
 ├── pom.xml
-└── README.md
+└── README.MD
 
 🚀 Quick Start
 Prerequisites
 
-Make sure you have installed:
+Install:
 
 Java 21+
 Maven
@@ -370,16 +377,6 @@ cd Real-Time-Fintech-Payment-Fraud-Detection-Platform
 2. Start Infrastructure
 docker compose up -d
 
-
-This starts the required infrastructure:
-
-PostgreSQL 17
-PgVector
-Redis 7
-Kafka 3.8
-
-If your Compose file is located under infra/, run the command from the appropriate directory or specify the Compose file explicitly.
-
 3. Configure OpenAI
 
 Linux / macOS:
@@ -395,28 +392,22 @@ $env:OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxx"
 mvn spring-boot:run
 
 
-The application will start on:
+Application:
 
 http://localhost:8080
 
 📖 API Documentation
 
-Once the application is running, open:
+Swagger UI:
 
 http://localhost:8080/swagger-ui.html
 
-
-Swagger provides an interactive interface for testing the REST APIs.
-
 💳 Submit a Transaction
-
-Example request:
-
 POST /api/v1/transactions
 Content-Type: application/json
 
 
-Example payload:
+Example:
 
 {
   "accountId": "ACC-10001",
@@ -427,7 +418,7 @@ Example payload:
 }
 
 
-The request enters the following pipeline:
+Transaction processing flow:
 
 POST /transactions
        │
@@ -470,9 +461,6 @@ Run Spring Modulith architecture verification:
 
 mvn test -Dtest=ModularityTests
 
-
-The modularity verification ensures that the application's module boundaries remain intact.
-
 📡 Kafka Events
 Transaction Events
 aegis.transaction.v1
@@ -502,7 +490,7 @@ AccountFrozen
 🔐 Design Principles
 Event-Driven
 
-Modules communicate asynchronously through Kafka rather than tightly coupled direct calls.
+Modules communicate asynchronously through Kafka.
 
 Modular
 
@@ -510,11 +498,11 @@ Business capabilities are isolated using Spring Modulith.
 
 AI-Native
 
-AI is part of the fraud decision pipeline rather than an external afterthought.
+AI is integrated directly into the fraud decision pipeline.
 
 Context-Aware
 
-Historical transaction behavior is incorporated into risk analysis using RAG.
+Historical transaction behavior is incorporated using RAG.
 
 Auditable
 
@@ -522,11 +510,11 @@ Fraud decisions and remediation actions are recorded in an immutable ledger.
 
 Reliable
 
-The Transactional Outbox Pattern ensures domain state and events are persisted atomically.
+The Transactional Outbox Pattern ensures reliable event publishing.
 
 Scalable
 
-Java 21 virtual threads and asynchronous event processing support high-concurrency workloads.
+Java 21 Virtual Threads and asynchronous processing support high-concurrency workloads.
 
 🗺️ Roadmap
  Real-time fraud monitoring dashboard
@@ -578,4 +566,4 @@ Detect → Explain → Respond → Audit
 
 Built with ❤️ for intelligent fintech security.
 
-</div>
+</div> ```
