@@ -106,58 +106,60 @@ Built with **Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka,
                                       │ Trail              │
                                       └────────────────────┘
 ```
+
 ### 🧩 Modules
 
 Aegis Pay follows a modular architecture using Spring Modulith.
 
-Module	Responsibility	Owns
-ingestion	Transaction intake, validation and normalization	Transaction aggregate
-riskengine	AI fraud scoring, RAG and historical analysis	risk_assessments
-remediation	Automated account actions	Account aggregate
-ledger	Immutable audit trail	ledger_events
+| Module | Responsibility | Owns |
+|---|---|---|
+| ingestion | Transaction intake, validation and normalization | Transaction aggregate |
+| riskengine | AI fraud scoring, RAG and historical analysis | risk_assessments |
+| remediation | Automated account actions | Account aggregate |
+| ledger | Immutable audit trail | ledger_events |
 
 Modules communicate asynchronously through versioned Kafka events.
 
-aegis.<domain>.vN
-
+`aegis.<domain>.vN`
 
 Examples:
-```
+
+```text
 aegis.transaction.v1
 aegis.risk.v1
 aegis.remediation.v1
 ```
-🔄 Transaction Flow
-1. Transaction Ingestion
+
+## 🔄 Transaction Flow
+
+### 1. Transaction Ingestion
 
 A payment transaction is submitted through:
 
-POST /api/v1/transactions
-
+`POST /api/v1/transactions`
 
 The ingestion module:
 
-Validates the request
-Normalizes transaction data
-Persists the transaction
-Creates an outbox event
+- Validates the request
+- Normalizes transaction data
+- Persists the transaction
+- Creates an outbox event
 
 The transaction and outbox event are committed atomically.
 
-2. Transactional Outbox
+### 2. Transactional Outbox
 
 The transaction produces:
 
-TransactionRecorded
-
+`TransactionRecorded`
 
 which is stored in:
 
-outbox_event
-
+`outbox_event`
 
 #### The OutboxRelay publishes the event to Kafka.
-```
+
+```text
 Database Transaction
         │
         ├── Transaction
@@ -169,14 +171,15 @@ Database Transaction
                  │
                  ▼
                Kafka
-
 ```
-3. AI Risk Assessment
+
+### 3. AI Risk Assessment
 
 The riskengine consumes the transaction event.
 
 The first stage uses Ollama for a fast assessment.
 
+```text
 Transaction
      │
      ▼
@@ -188,20 +191,22 @@ Ollama Fast Assessment
                 │
                 ▼
         OpenAI Deep Assessment
-
+```
 
 The deep assessment can use:
 
-Historical transactions
-PgVector similarity search
-Customer transaction behavior
-IP reputation
-Transaction metadata
-AI-generated reasoning
-🧠 RAG-Based Fraud Detection
+- Historical transactions
+- PgVector similarity search
+- Customer transaction behavior
+- IP reputation
+- Transaction metadata
+- AI-generated reasoning
+
+## 🧠 RAG-Based Fraud Detection
 
 Aegis Pay uses PostgreSQL + PgVector to retrieve historical transaction context.
 
+```text
 Incoming Transaction
         │
         ▼
@@ -218,26 +223,27 @@ OpenAI Deep Assessment
         │
         ▼
 Risk Score
-
+```
 
 This allows the AI to evaluate a transaction in the context of previous customer behavior.
 
-🚨 Risk & Remediation
+## 🚨 Risk & Remediation
 
 When the risk score exceeds the configured threshold, the risk engine publishes:
 
-aegis.risk.v1.HighRiskTransactionDetected
-
+`aegis.risk.v1.HighRiskTransactionDetected`
 
 The remediation module consumes the event.
 
-Risk Score	Action
-< 75	Allow / Monitor
->= 75	Flag Account
->= 90	Freeze Account
+| Risk Score | Action |
+|---|---|
+| < 75 | Allow / Monitor |
+| >= 75 | Flag Account |
+| >= 90 | Freeze Account |
 
 Example:
 
+```text
 Risk Score = 94
        │
        ▼
@@ -251,20 +257,23 @@ Remediation Event
        │
        ▼
 Immutable Ledger
+```
 
-📒 Immutable Audit Ledger
+## 📒 Immutable Audit Ledger
 
 The ledger module maintains an append-only audit trail.
 
 Important events include:
 
-Transaction events
-Risk assessments
-Fraud decisions
-High-risk detections
-Account flags
-Account freezes
-Remediation events
+- Transaction events
+- Risk assessments
+- Fraud decisions
+- High-risk detections
+- Account flags
+- Account freezes
+- Remediation events
+
+```text
 Transaction
      │
      ▼
@@ -278,22 +287,25 @@ Remediation
      │
      ▼
 Immutable Ledger
+```
 
-📦 Transactional Outbox Pattern
+## 📦 Transactional Outbox Pattern
 
 Aegis Pay uses the Transactional Outbox Pattern for reliable event publishing.
 
 Instead of:
 
+```text
 Save Transaction
       ↓
 Publish Kafka Event
       ↓
 Kafka Failure ❌
-
+```
 
 The system performs:
 
+```text
 ┌────────────────────────────┐
 │       DB Transaction       │
 │                            │
@@ -309,26 +321,33 @@ The system performs:
               │
               ▼
             Kafka
-
+```
 
 This prevents inconsistencies between database state and published events.
 
-🛠️ Technology Stack
-Technology	Purpose
-Java 21	Application runtime
-Spring Boot 3.5	Backend framework
-Spring Modulith 1.4	Modular architecture
-Spring AI 1.0	AI integration
-Ollama	Local LLM assessment
-OpenAI	Deep AI assessment
-Apache Kafka	Event streaming
-PostgreSQL 17	Primary database
-PgVector	Vector similarity search
-Redis 7	Caching
-Virtual Threads	High-concurrency processing
-Maven	Build system
-Docker Compose	Infrastructure
-📁 Project Structure
+---
+
+## 🛠️ Technology Stack
+
+| Technology | Purpose |
+|---|---|
+| Java 21 | Application runtime |
+| Spring Boot 3.5 | Backend framework |
+| Spring Modulith 1.4 | Modular architecture |
+| Spring AI 1.0 | AI integration |
+| Ollama | Local LLM assessment |
+| OpenAI | Deep AI assessment |
+| Apache Kafka | Event streaming |
+| PostgreSQL 17 | Primary database |
+| PgVector | Vector similarity search |
+| Redis 7 | Caching |
+| Virtual Threads | High-concurrency processing |
+| Maven | Build system |
+| Docker Compose | Infrastructure |
+
+## 📁 Project Structure
+
+```text
 aegis-pay/
 │
 ├── ingestion/
@@ -355,61 +374,79 @@ aegis-pay/
 │   └── compose/
 │
 ├── pom.xml
-└── README.MD
+└── README.md
+```
 
-🚀 Quick Start
-Prerequisites
+## 🚀 Quick Start
+
+### Prerequisites
 
 Install:
 
-Java 21+
-Maven
-Docker
-Docker Compose
-Ollama
+- Java 21+
+- Maven
+- Docker
+- Docker Compose
+- Ollama
 
 You also need an OpenAI API key for the deep AI assessment flow.
 
-1. Clone the Repository
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/imrajeevnayan/Real-Time-Fintech-Payment-Fraud-Detection-Platform.git
 
 cd Real-Time-Fintech-Payment-Fraud-Detection-Platform
+```
 
-2. Start Infrastructure
+### 2. Start Infrastructure
+
+```bash
 docker compose up -d
+```
 
-3. Configure OpenAI
+### 3. Configure OpenAI
 
 Linux / macOS:
 
+```bash
 export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
-
+```
 
 Windows PowerShell:
 
+```powershell
 $env:OPENAI_API_KEY="sk-xxxxxxxxxxxxxxxx"
+```
 
-4. Start the Application
+### 4. Start the Application
+
+```bash
 mvn spring-boot:run
-
+```
 
 Application:
 
-http://localhost:8080
+`http://localhost:8080`
 
-📖 API Documentation
+---
+
+## 📖 API Documentation
 
 Swagger UI:
 
-http://localhost:8080/swagger-ui.html
+`http://localhost:8080/swagger-ui.html`
 
-💳 Submit a Transaction
+### 💳 Submit a Transaction
+
+```text
 POST /api/v1/transactions
 Content-Type: application/json
-
+```
 
 Example:
 
+```json
 {
   "accountId": "ACC-10001",
   "amount": 24999.00,
@@ -417,10 +454,11 @@ Example:
   "merchant": "Example Merchant",
   "paymentMethod": "UPI"
 }
-
+```
 
 Transaction processing flow:
 
+```text
 POST /transactions
        │
        ▼
@@ -450,117 +488,141 @@ POST /transactions
               │
               ▼
             Ledger
+```
 
-🧪 Testing
+---
+
+## 🧪 Testing
 
 Run the complete test suite:
 
+```bash
 mvn test
-
+```
 
 Run Spring Modulith architecture verification:
 
+```bash
 mvn test -Dtest=ModularityTests
+```
 
-📡 Kafka Events
-Transaction Events
-aegis.transaction.v1
+---
 
+## 📡 Kafka Events
 
-Example:
+### Transaction Events
 
-TransactionRecorded
-
-Risk Events
-aegis.risk.v1
-
+`aegis.transaction.v1`
 
 Example:
 
-HighRiskTransactionDetected
+`TransactionRecorded`
 
-Remediation Events
-aegis.remediation.v1
+### Risk Events
 
+`aegis.risk.v1`
+
+Example:
+
+`HighRiskTransactionDetected`
+
+### Remediation Events
+
+`aegis.remediation.v1`
 
 Examples:
 
-AccountFlagged
-AccountFrozen
+`AccountFlagged`
 
-🔐 Design Principles
-Event-Driven
+`AccountFrozen`
+
+---
+
+## 🔐 Design Principles
+
+**Event-Driven**
 
 Modules communicate asynchronously through Kafka.
 
-Modular
+**Modular**
 
 Business capabilities are isolated using Spring Modulith.
 
-AI-Native
+**AI-Native**
 
 AI is integrated directly into the fraud decision pipeline.
 
-Context-Aware
+**Context-Aware**
 
 Historical transaction behavior is incorporated using RAG.
 
-Auditable
+**Auditable**
 
 Fraud decisions and remediation actions are recorded in an immutable ledger.
 
-Reliable
+**Reliable**
 
 The Transactional Outbox Pattern ensures reliable event publishing.
 
-Scalable
+**Scalable**
 
 Java 21 Virtual Threads and asynchronous processing support high-concurrency workloads.
 
-🗺️ Roadmap
- Real-time fraud monitoring dashboard
- Fraud investigation dashboard
- Explainable AI fraud reports
- Device fingerprint analysis
- Geolocation anomaly detection
- Transaction velocity rules
- Fraud-ring / graph detection
- Model evaluation pipeline
- Model drift monitoring
- Human-in-the-loop fraud review
- OpenTelemetry integration
- Prometheus + Grafana monitoring
- Kubernetes deployment
- Debezium CDC integration
- Multi-tenant fintech support
-⚠️ Disclaimer
+---
+
+## 🗺️ Roadmap
+
+- Real-time fraud monitoring dashboard
+- Fraud investigation dashboard
+- Explainable AI fraud reports
+- Device fingerprint analysis
+- Geolocation anomaly detection
+- Transaction velocity rules
+- Fraud-ring / graph detection
+- Model evaluation pipeline
+- Model drift monitoring
+- Human-in-the-loop fraud review
+- OpenTelemetry integration
+- Prometheus + Grafana monitoring
+- Kubernetes deployment
+- Debezium CDC integration
+- Multi-tenant fintech support
+
+---
+
+## ⚠️ Disclaimer
 
 This project is intended for educational, research, and engineering purposes.
 
 It should not be used directly in a production financial environment without appropriate:
 
-Security review
-Compliance validation
-Fraud-model validation
-Privacy controls
-Load testing
-Reliability testing
-Operational monitoring
-Human oversight
+- Security review
+- Compliance validation
+- Fraud-model validation
+- Privacy controls
+- Load testing
+- Reliability testing
+- Operational monitoring
+- Human oversight
 
 AI-generated fraud decisions should be independently validated before being used to automatically block real financial transactions.
 
-⭐ Contributing
+---
+
+## ⭐ Contributing
 
 Contributions, ideas, bug reports, and architecture improvements are welcome.
 
 If you find this project useful, consider giving the repository a ⭐.
 
-📄 License
+---
+
+## 📄 License
 
 See the repository license for applicable usage and distribution terms.
 
 <div align="center">
+
 🛡️ Aegis Pay
 
 Detect → Explain → Respond → Audit
