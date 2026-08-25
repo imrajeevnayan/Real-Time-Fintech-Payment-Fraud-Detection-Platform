@@ -106,7 +106,7 @@ Built with **Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka,
                                       │ Trail              │
                                       └────────────────────┘
 ```
-🧩 Modules
+### 🧩 Modules
 
 Aegis Pay follows a modular architecture using Spring Modulith.
 
@@ -122,11 +122,11 @@ aegis.<domain>.vN
 
 
 Examples:
-
+```
 aegis.transaction.v1
 aegis.risk.v1
 aegis.remediation.v1
-
+```
 🔄 Transaction Flow
 1. Transaction Ingestion
 
@@ -156,8 +156,8 @@ which is stored in:
 outbox_event
 
 
-The OutboxRelay publishes the event to Kafka.
-
+#### The OutboxRelay publishes the event to Kafka.
+```
 Database Transaction
         │
         ├── Transaction
@@ -170,6 +170,7 @@ Database Transaction
                  ▼
                Kafka
 
+```
 3. AI Risk Assessment
 
 The riskengine consumes the transaction event.
