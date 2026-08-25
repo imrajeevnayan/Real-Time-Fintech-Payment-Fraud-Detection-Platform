@@ -105,7 +105,7 @@ Built with **Java 21, Spring Boot 3.5, Spring Modulith, Spring AI, Apache Kafka,
                                       │ Immutable Audit    │
                                       │ Trail              │
                                       └────────────────────┘
-
+```
 🧩 Modules
 
 Aegis Pay follows a modular architecture using Spring Modulith.
