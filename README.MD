@@ -566,4 +566,4 @@ Detect → Explain → Respond → Audit
 
 Built with ❤️ for intelligent fintech security.
 
-</div> ```
+</div>
